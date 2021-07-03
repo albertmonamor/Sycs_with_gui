@@ -1,0 +1,120 @@
+#: import utils kivy.utils
+
+
+<ShowListOfSub>
+    orientation: "vertical"
+    ScrollView:
+
+        MDList:
+            id: AllDirectories
+
+
+<AppV1_1>
+    FloatLayout:
+
+        size: root.width, root.height
+
+        Screen:
+            FloatLayout:
+                BoxLayout:
+                    orientation: "vertical"
+
+                    MDToolbar:
+                        id: WindowMenu
+                        title: ""
+
+                    MDLabel:
+                        text: ""
+
+        MDScreen:
+            MDCard:
+                orientation: "vertical"
+                padding: "9dp"
+                size_hint: None, None
+                size: "310dp", "100dp"
+                pos: (30, 430)
+
+                MDLabel:
+                    id : DefMain
+                    text: "Define Your main Directory"
+                    size_hint_y: None
+                    height: self.texture_size[1]
+                    theme_text_color: "Error" # 'Primary', 'Secondary', 'Hint', 'Error', 'Custom', 'ContrastParentBackground'
+
+
+                MDSeparator:
+                    height: "1dp"
+
+                MDTextField:
+                    id: PathMainDir
+                    hint_text: "Path:"
+
+        MDFlatButton:
+            id : SaveMainDir
+            text:"Save Path"
+            font_size: "18sp"
+            theme_text_color: "Custom"
+            md_bg_color: utils.get_color_from_hex("#f0c4c4")
+            pos: (140,380)
+            on_press: root.PathOfMainDir()
+
+
+        MDScreen:
+
+            MDCard:
+                orientation: "vertical"
+                padding: "8dp"
+                size_hint: None, None
+                size: "280dp", "100dp"
+                pos_hint: {"center_x": .70, "center_y": .8}
+
+                MDLabel:
+                    id : DefSub
+                    text: "Define Sub Directories"
+                    theme_text_color: "Error"
+                    size_hint_y: None
+                    height: self.texture_size[1]
+
+                MDSeparator:
+                    height: "5dp"
+
+                MDTextField:
+                    id: Dir1
+                    hint_text: "Your sub Folder:"
+                    max_text_length: 100
+
+                MDSeparator:
+                    height: "3dp"
+
+
+        MDRaisedButton:
+            text: "Options"
+            font_size: "18sp"
+            on_press: root.OptionsOfSubDirs()
+            pos_hint: {"center_x":.70, "center_y":.66}
+
+        MDRaisedButton:
+            id : StartSyncs
+            text: f"START SYNCS WITH"
+            pos_hint: {'center_x': .5, 'center_y': .4}
+            on_release: root.OpenStartSyncs()
+
+        MDLabel:
+            id: TOfResult
+            text: "which mode to use?\n\n1 -> Sync from Main To Sub Folders\n\n2 -> Sync Sub folder To Main Folder "
+            pos_hint: {'center_x': .75, 'center_y': .25}
+
+        MDCheckbox:
+            id: ModeMain
+            size_hint: None, None
+            size: "48dp", "48dp"
+            pos_hint: {'center_x': .65, 'center_y': .25}
+            on_active: root.SelectMode(*args)
+
+        MDCheckbox:
+            id : ModeSub
+            size_hint: None, None
+            size: "48dp", "48dp"
+            pos_hint: {'center_x': .65, 'center_y': .18}
+            on_active: root.SelectMode(*args)
+
