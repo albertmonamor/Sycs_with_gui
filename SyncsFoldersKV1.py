@@ -10,17 +10,18 @@ from kivymd.uix.button import MDFlatButton
 from kivymd.uix.dialog import MDDialog
 from kivymd.uix.list import OneLineListItem
 from SyncsFoldersV1 import chType, SyncFolders
-Builder.load_file(r"YOUR_PATH\Syncs.kv")
+
+Builder.load_file(r"c:\Users\saban\Desktop\TKINTER\X_tkinter\Syncs.kv")
 
 
 class ShowListOfSub(BoxLayout):
     def __init__(self, _listSub, **k):
         super().__init__(**k)
         x = 0
-        for i in _listSub:
-
+        for i in AppV1_1().AllSubDirs:
             x += 1
-            self.ids.AllDirectories.add_widget(OneLineListItem(text=f"{x} - {str(i).upper()}"))
+            print(i)
+            self.ids.AllDirectories.add_widget(OneLineListItem(text=f"hello"))
 
 
 class AppV1_1(Widget):
@@ -38,7 +39,6 @@ class AppV1_1(Widget):
         self.AllSubDirs = []
         self.NumFolders = 0
         self.NumFiles = 0
-        self.ids.WindowMenu.title = f"Have {self.NumFolders:,} Folders in Computer and {self.NumFiles:,} files"
         self.__call__()
 
     def __call__(self, *args, **kwargs):
@@ -51,8 +51,6 @@ class AppV1_1(Widget):
             MB.text = "Change"
             MT.text = self.RootDir
             self.CheckMemory(flag="Sub")
-
-        threading.Thread(target=self.AllFilesFolders).start()
 
     def PathOfMainDir(self):
         Path = self.ids.PathMainDir
@@ -106,7 +104,7 @@ class AppV1_1(Widget):
                     MDFlatButton(
                         text="Close",
                         on_press=self.CloseAlert)],
-                        )
+            )
         self.ALERT.open()
         self.ALERT = None
 
@@ -118,11 +116,11 @@ class AppV1_1(Widget):
 
     def OptionsOfSubDirs(self):
         BottomSM = MDGridBottomSheet()
-        data =[
-                {"text": "Delete All Sub", "func": self.DelSubMemory, "ico": "delete-forever"},
-                {"text": "Append Folder", 'func': self.SaveSubDirectories, "ico": "plus-box-outline"},
-                {"text": 'open list sub', 'func': self.OpenAllSubDirectories, "ico": "open-in-new"}
-            ]
+        data = [
+            {"text": "Delete All Sub", 'func': self.DelSubMemory, "ico": "delete-forever"},
+            {"text": "Append Folder", 'func': self.SaveSubDirectories, "ico": "plus-box-outline"},
+            {"text": 'open list sub', 'func': self.OpenAllSubDirectories, "ico": "open-in-new"}
+        ]
         for _dict in data:
             BottomSM.add_item(
                 _dict['text'].upper(),
@@ -145,27 +143,25 @@ class AppV1_1(Widget):
 
         if not len(os.listdir(self.FM)) == 1 and not WD:
             OFile = open(self.SMNF, "ab")
-            pickle.dump({"Main": None, "NumFile": None, "NumFolder": None, "Sub1": None}, OFile)
+            pickle.dump({"Main": None, "Sub1": None}, OFile)
 
         elif WD:
             os.system(f"del {self.SMNF}")
             OFile = open(self.SMNF, "ab")
-            pickle.dump({"Main": WD[0], "NumFile": WD[1], "NumFolder": WD[2], "Sub1": None}, OFile)
+            pickle.dump({"Main": WD[0], "Sub1": None}, OFile)
 
             # end
             OFile.close()
-            self.CheckMemory(flag="Sub")
 
     def DelSubMemory(self):
         x = []
         if os.path.exists(self.FM):
+
             # take 1.Main 2.numFile 3.numFolder
             OFile = open(self.SMNF, "rb")
             data = pickle.load(OFile)
             OFile.close()
             x.append(data['Main'])
-            x.append(data['NumFile'])
-            x.append(data['NumFolder'])
             self.Memory(WD=x)
             self.AllSubDirs = []
             self.CheckMemory(flag="Sub")
@@ -184,6 +180,7 @@ class AppV1_1(Widget):
         if flag == "Sub":
             for k, v in data.items():
                 if "Sub" in k:
+                    print(k, v)
                     self.AllSubDirs.append(v)
 
     def SaveSubDirectories(self):
@@ -202,7 +199,8 @@ class AppV1_1(Widget):
         if self.CheckPath(obj2.text) and obj2.text != data['Main'] and obj2.text not in x_check and self.RootDir:
             self.AllSubDirs.append(obj2.text)
             OFile = open(self.SMNF, "wb")
-            data[f'Sub{len(data.keys())-2}'] = obj2.text
+            data[f'Sub{len(data.keys())}'] = obj2.text
+            print(f'Sub{len(data.keys())}')
             pickle.dump(data, OFile)
             OFile.close()
             obj2.text = ""
@@ -239,7 +237,7 @@ class AppV1_1(Widget):
             OFile = open(self.SMNF, "rb")
             data = pickle.load(OFile)
             OFile.close()
-            self.ids.WindowMenu.title =\
+            self.ids.WindowMenu.title = \
                 f"Have {int(data['NumFolder']):,} Folders in Computer and {int(data['NumFile']):,} files"
 
     def OpenStartSyncs(self):
@@ -251,8 +249,8 @@ class AppV1_1(Widget):
             self.ids.StartSyncs.disabled = True
             for SubFolder in self.AllSubDirs:
                 x += 1
-                self.ids.WindowMenu.title =\
-                    f"Mapping Folder..{SubFolder} {(x* 100) // (len(self.AllSubDirs))}% complete"
+                self.ids.WindowMenu.title = \
+                    f"Mapping Folder..{SubFolder} {(x * 100) // (len(self.AllSubDirs))}% complete"
                 if SubFolder:
                     if os.path.exists(SubFolder):
                         self.SyncFolder.Sync(self.SyncFolder.GetFolders(self.RootDir, SubFolder), RSL=self.IsAction)

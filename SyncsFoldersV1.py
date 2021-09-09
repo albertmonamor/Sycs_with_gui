@@ -40,8 +40,7 @@ class MFolders(object):
     """
 
     def __init__(self):
-        xRun = os.popen("echo %username%").read().split("\n")
-        self.Name = xRun[0]
+        self.Name = os.getlogin()
         self.lisOfFiles = []
         self.li = []
         self.TREE = []
@@ -75,11 +74,14 @@ class MFolders(object):
                                     "time_opn": os.path.getatime(fPath),
                                     "type": chType(fPath),
                                     "sub": fPath[
-                                           fPath.rfind(os.path.basename(Folder)) + len(os.path.basename(Folder)) + 1:]})
+                                           fPath.rfind(os.path.basename(Folder)) + len(os.path.basename(Folder)) + 1:],
+                                    "parent": _xFile})
                 except FileNotFoundError as e:
+                    f"{e}"
                     pass
+            else:
+                pass
 
-                _xFile += 1
             self.lisOfFiles.append({"folder": folder[0], "files": self.li})
             _xFolder += 1
 
@@ -107,7 +109,7 @@ class SyncFolders(MFolders):
     def __init__(self, obj=None):
         MFolders.__init__(self)
         self.liFilesMain = []
-        self.slash = "\\"
+        self.slash = os.altsep
         self.OBJ = obj
         self.SCopy = 0
         self.XNum = 0
@@ -247,7 +249,7 @@ class SyncPictureIOS(MFolders):
                 if self.RM:
                     os.remove(f"{P}")
 
-                print(fr"[INFO] copied and remove > {P} {TP}")
+                print(fr"[INFO] copied "+"and remove" if self.RM else ""+f" > {P} {TP}")
 
     def __paths(self, mf):
         xPath = os.path.dirname(mf)
@@ -288,23 +290,33 @@ def SearchOldFile(Path):
             for _ in _dict['files']:
 
                 if time()-MONTH < _['time_ch'] or time()-MONTH < _['time_opn']:
-                    yield {"status": "used in last", "path": f"{_dict['folder']}\\{_['name']}", "level": 0}
+                    yield {"status": "used in last", "path": f"{_dict['folder']}\\{_['name']}",
+                           "size": _['size'], "level": 0}
 
                 elif time()-HALF_YEAR < _['time_opn'] < time()-MONTH or time()-HALF_YEAR < _['time_ch'] < time()-MONTH:
-                    yield {"status": "Proper", "path": f"{_dict['folder']}\\{_['name']}", "level": 1}
+                    yield {"status": "Proper", "path": f"{_dict['folder']}\\{_['name']}",
+                           "size": _['size'], "level": 1}
 
                 elif time()-YEAR < _['time_opn'] < time()-HALF_YEAR or time()-YEAR < _['time_ch'] < time()-HALF_YEAR:
-                    yield {"status": "Invalid", "path": f"{_dict['folder']}\\{_['name']}", "level": 2}
+                    yield {"status": "Invalid", "path": f"{_dict['folder']}\\{_['name']}",
+                           "size": _['size'], "level": 2}
 
                 elif time()-YEAR > _['time_opn'] or time()-YEAR > _['time_ch']:
-                    yield {"status": "Garbage", "path": f"{_dict['folder']}\\{_['name']}", "level": 3}
+                    yield {"status": "Garbage", "path": f"{_dict['folder']}\\{_['name']}",
+                           "size": _['size'], "level": 3}
 
 
 if __name__ == "__main__":
     if input("::>") == "S":
         s = SyncFolders()
-        s.Sync(s.GetFolders(rf"c:\Users\{s.Name}\Desktop\TEST",
-                            fr"c:\Users\{s.Name}\Desktop\TEST2"), RSL=False)
+        a = s.GetFolders(rf"c:\Users\{s.Name}\Desktop\_new",)
+        print(a)
     else:
-        s = SyncPictureIOS()
-        s.FilterOfTypes(s.GetFolders(fr"c:\Users\{s.Name}\Desktop\TEST3"))
+        pass
+
+"""for i in a:
+    for q in i:
+        print(q)
+        if "files" in q:
+            for _ in q['files']:
+                print(_)"""
